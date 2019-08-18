@@ -1,43 +1,62 @@
-FROM php:7.2-cli-alpine
+FROM php:7.2-fpm-alpine
 
 LABEL maintainer="Laihj <416703504@qq.com>"
 
+ARG swoole
+
+##
+# ---------- env settings ----------
+##
+ENV SWOOLE_VERSION 4.4.3
 RUN set -ex \
     && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/' /etc/apk/repositories \
     && apk update \
     && apk add --no-cache \
-    && apk add --no-cache libstdc++ openssl git bash \
-    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS libaio-dev openssl-dev \
-    && apk add --no-cache \
-    ca-certificates \
     curl \
+    zip \
+    unzip \
     wget \
-    tar \
-    xz \
-    libressl \
-    tzdata \
-    pcre  
+    openssl \
+    libstdc++ \
+    make \
+    autoconf  \
+    git \
+    gcc \
+    g++ \
+    openssl \
+    libstdc++ \
+    libaio-dev \
+    openssl-dev \
+    pkgconf \
+    re2c \
+    pcre-dev \
+    zlib-dev \
+    libtool \
+    automake
 
-RUN cd /tmp \
-    && curl -SL "https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz" -o swoole.tar.gz \
-    && ls -alh \
-    # php extension:swoole
-    && cd /tmp \
+
+
+# composer
+RUN curl -sS https://getcomposer.org/installer | php \
+    && mv composer.phar /usr/bin/composer \
+    && composer self-update --clean-backups
+
+# use aliyun composer
+RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+
+
+# swoole ext
+RUN wget https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz -O swoole.tar.gz \
     && mkdir -p swoole \
     && tar -xf swoole.tar.gz -C swoole --strip-components=1 \
+    && rm swoole.tar.gz \
     && ( \
-        cd swoole \
-        && phpize \
-        && ./configure --enable-mysqlnd --enable-openssl \
-        && make -s -j$(nproc) && make install \
+    cd swoole \
+    && phpize \
+    && ./configure --enable-openssl \
+    && make \
+    && make install \
     ) \
-    && echo "extension=swoole.so" > /etc/php7/conf.d/swoole.ini \
-    && echo "swoole.use_shortname = 'Off'" >> /etc/php7/conf.d/swoole.ini \
-    # clear
-    && php -v \
-    && php -m \
-    && php --ri swoole \
-    # ---------- clear works ----------
-    && apk del .build-deps \
-    && rm -rf /var/cache/apk/* /tmp/* /usr/share/man \
-    && echo -e "\033[42;37m Build Completed :).\033[0m\n"
+    && touch /usr/local/etc/php/conf.d/swoole.ini \
+    && echo "extension=swoole.so" >> /usr/local/etc/php/conf.d/swoole.ini \
+    && rm -r swoole
