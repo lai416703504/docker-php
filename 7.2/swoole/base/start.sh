@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd /easyswoole \
-	&& composer install
+	&& composer install \
 	&& php easyswoole start
