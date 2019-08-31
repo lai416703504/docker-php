@@ -7,7 +7,7 @@ ARG swoole
 ##
 # ---------- env settings ----------
 ##
-ENV SWOOLE_VERSION 4.4.3
+ENV SWOOLE_VERSION 4.4.4
 RUN set -ex \
     && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/' /etc/apk/repositories \
     && apk update \
