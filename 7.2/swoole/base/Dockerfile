@@ -112,10 +112,11 @@ RUN curl -sS https://getcomposer.org/installer | php \
 # use aliyun composer
 RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
+COPY ./start.sh /tmp/start.sh
 
 WORKDIR /easyswoole
 
 EXPOSE 9501
 
 
-CMD ["php","easyswoole","start"]
+CMD ["/tmp/start.sh"]
