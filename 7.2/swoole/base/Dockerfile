@@ -9,7 +9,7 @@ ARG swoole
 ##
 ENV SWOOLE_VERSION=${swoole:-"4.4.4"} \
     #  install and remove building packages
-    PHPIZE_DEPS="autoconf dpkg-dev dpkg file g++ gcc libc-dev make php7-dev php7-pear pkgconf re2c pcre-dev zlib-dev libtool automake"
+    PHPIZE_DEPS="autoconf dpkg-dev dpkg file g++ gcc curl zip unzip libc-dev make php7-dev php7-pear pkgconf re2c pcre-dev zlib-dev libtool automake"
 
 RUN set -ex \
     # change apk source repo
@@ -42,7 +42,6 @@ RUN set -ex \
     php7-pdo_sqlite \
     php7-phar \
     php7-posix \
-    php7-redis \
     php7-simplexml \
     php7-sockets \
     php7-sodium \
